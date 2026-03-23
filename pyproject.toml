@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "verifactu"
-version = "0.1.0"
-description = "Python SDK for AEAT's Verifactu electronic invoicing system"
+version = "0.1.1"
+description = "Unofficial Python SDK for AEAT's Verifactu electronic invoicing system"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

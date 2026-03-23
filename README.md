@@ -1,6 +1,6 @@
-# VERI\*FACTU Python SDK
+# VERI\*FACTU Python SDK (Unofficial)
 
-Python SDK for Spain's AEAT Verifactu electronic invoicing system (Real Decreto 1007/2023).
+Unofficial Python SDK for Spain's AEAT Verifactu electronic invoicing system (Real Decreto 1007/2023).
 
 ---
 
