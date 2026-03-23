@@ -8,7 +8,7 @@ Python SDK for Spain's AEAT Verifactu electronic invoicing system (Real Decreto 
 >
 > This library is an **independent open-source contribution** and is **not affiliated with, endorsed by, or produced by** the Spanish Tax Agency (AEAT) or any official software manufacturer.
 >
-> The author (`jalvarezz13`) provides this SDK on a best-effort basis. **No warranty is given** regarding correctness, completeness, fitness for a particular purpose, or compliance with any specific version of the Verifactu regulation. Tax obligations are your responsibility. Always verify your submissions against official AEAT documentation and consult a qualified tax advisor before using this software in production.
+> The author (`Javier Álvarez`) provides this SDK on a best-effort basis. **No warranty is given** regarding correctness, completeness, fitness for a particular purpose, or compliance with any specific version of the Verifactu regulation. Tax obligations are your responsibility. Always verify your submissions against official AEAT documentation and consult a qualified tax advisor before using this software in production.
 >
 > By using this SDK, you accept that the author bears **no liability** for any direct or indirect damages arising from its use, including but not limited to rejected invoices, regulatory penalties, or data loss.
 
@@ -177,12 +177,12 @@ The SDK converts PKCS#12 to PEM internally using the `cryptography` library. No 
 
 Pass `environment=Environment.PRODUCTION` or `environment=Environment.SANDBOX` (default).
 
-| Mode | Certificate type | Environment | Host |
-|------|-----------------|-------------|------|
-| VERI\*FACTU | Personal | Production | `www1.agenciatributaria.gob.es` |
-| VERI\*FACTU | Entity seal | Production | `www10.agenciatributaria.gob.es` |
-| VERI\*FACTU | Personal | Sandbox | `prewww1.aeat.es` |
-| VERI\*FACTU | Entity seal | Sandbox | `prewww10.aeat.es` |
+| Mode        | Certificate type | Environment | Host                             |
+| ----------- | ---------------- | ----------- | -------------------------------- |
+| VERI\*FACTU | Personal         | Production  | `www1.agenciatributaria.gob.es`  |
+| VERI\*FACTU | Entity seal      | Production  | `www10.agenciatributaria.gob.es` |
+| VERI\*FACTU | Personal         | Sandbox     | `prewww1.aeat.es`                |
+| VERI\*FACTU | Entity seal      | Sandbox     | `prewww10.aeat.es`               |
 
 The same four combinations apply to NO VERI\*FACTU (requerimiento) mode, using a different SOAP path.
 
@@ -217,30 +217,30 @@ Set `is_verifactu=False` to target the requerimiento (NO VERI\*FACTU) endpoint. 
 
 ### Methods
 
-| Method | Description |
-|--------|-------------|
-| `submit(cabecera, records)` | Send up to 1000 `RegistroAlta` or `RegistroAnulacion` records. Returns `RespuestaEnvio`. |
-| `query(consulta)` | Query submitted invoices. Returns `RespuestaConsulta`. |
-| `close()` | Release the underlying HTTP session. Called automatically when used as a context manager. |
+| Method                      | Description                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| `submit(cabecera, records)` | Send up to 1000 `RegistroAlta` or `RegistroAnulacion` records. Returns `RespuestaEnvio`.  |
+| `query(consulta)`           | Query submitted invoices. Returns `RespuestaConsulta`.                                    |
+| `close()`                   | Release the underlying HTTP session. Called automatically when used as a context manager. |
 
 ### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `submit_url` | `str` | Resolved SOAP submission endpoint |
-| `query_url` | `str` | Resolved SOAP query endpoint |
+| Property         | Type  | Description                                          |
+| ---------------- | ----- | ---------------------------------------------------- |
+| `submit_url`     | `str` | Resolved SOAP submission endpoint                    |
+| `query_url`      | `str` | Resolved SOAP query endpoint                         |
 | `last_wait_time` | `int` | `TiempoEsperaEnvio` from the last response (seconds) |
 
 ### Exceptions raised
 
-| Exception | When |
-|-----------|------|
-| `ValidationError` | Record fails Pydantic validation before sending |
-| `CertificateError` | Certificate cannot be loaded or is invalid |
-| `SOAPFaultError` | AEAT returns a SOAP fault; `.is_retryable` is `True` for server-side faults |
-| `AEATError` | AEAT returns an application-level error code |
-| `ConnectionError` | Network or TLS failure |
-| `ChainError` | Hash chain state is inconsistent |
+| Exception          | When                                                                        |
+| ------------------ | --------------------------------------------------------------------------- |
+| `ValidationError`  | Record fails Pydantic validation before sending                             |
+| `CertificateError` | Certificate cannot be loaded or is invalid                                  |
+| `SOAPFaultError`   | AEAT returns a SOAP fault; `.is_retryable` is `True` for server-side faults |
+| `AEATError`        | AEAT returns an application-level error code                                |
+| `ConnectionError`  | Network or TLS failure                                                      |
+| `ChainError`       | Hash chain state is inconsistent                                            |
 
 ---
 
@@ -445,24 +445,24 @@ except ConnectionError as e:
 
 ### AEATError code ranges
 
-| Code range | Meaning | Property |
-|------------|---------|----------|
-| 1xxx | Record-level rejection | `.is_record_rejection` |
-| 2xxx | Accepted with errors | `.is_accepted_with_errors` |
-| 3000 | Duplicate submission | `.is_duplicate` |
-| 4xxx | Full submission rejection | `.is_full_rejection` |
+| Code range | Meaning                   | Property                   |
+| ---------- | ------------------------- | -------------------------- |
+| 1xxx       | Record-level rejection    | `.is_record_rejection`     |
+| 2xxx       | Accepted with errors      | `.is_accepted_with_errors` |
+| 3000       | Duplicate submission      | `.is_duplicate`            |
+| 4xxx       | Full submission rejection | `.is_full_rejection`       |
 
 ---
 
 ## Protocol limits and constants
 
-| Constant | Value |
-|----------|-------|
-| Max records per submission | 1,000 |
-| Max records per query response | 10,000 |
-| Default wait time between submissions | 60 seconds |
-| Max generation-to-send window | 240 seconds |
-| Verifactu protocol version | 1.0 |
+| Constant                              | Value       |
+| ------------------------------------- | ----------- |
+| Max records per submission            | 1,000       |
+| Max records per query response        | 10,000      |
+| Default wait time between submissions | 60 seconds  |
+| Max generation-to-send window         | 240 seconds |
+| Verifactu protocol version            | 1.0         |
 
 AEAT dynamically adjusts the wait time via `TiempoEsperaEnvio` in each response. Always read `response.tiempo_espera_envio` (or `client.last_wait_time`) and wait that many seconds before the next submission.
 
@@ -470,14 +470,14 @@ AEAT dynamically adjusts the wait time via `TiempoEsperaEnvio` in each response.
 
 ## Data formats
 
-| Field type | Format |
-|------------|--------|
-| Dates | `DD-MM-YYYY` |
-| Timestamps | `YYYY-MM-DDTHH:MM:SS+HH:00` (ISO 8601 with timezone offset) |
-| Monetary amounts | Signed decimal, up to 12 digits + 2 decimal places (e.g., `"1210.00"`) |
-| NIF | 9 characters |
-| Invoice series number | 1-60 characters |
-| SHA-256 hash | 64-character uppercase hex string |
+| Field type            | Format                                                                 |
+| --------------------- | ---------------------------------------------------------------------- |
+| Dates                 | `DD-MM-YYYY`                                                           |
+| Timestamps            | `YYYY-MM-DDTHH:MM:SS+HH:00` (ISO 8601 with timezone offset)            |
+| Monetary amounts      | Signed decimal, up to 12 digits + 2 decimal places (e.g., `"1210.00"`) |
+| NIF                   | 9 characters                                                           |
+| Invoice series number | 1-60 characters                                                        |
+| SHA-256 hash          | 64-character uppercase hex string                                      |
 
 ---
 
@@ -526,6 +526,7 @@ All enums live in `verifactu.models.enums`.
 Verifactu is Spain's mandatory electronic invoicing verification system, established by Real Decreto 1007/2023 and developed under Orden HAC/1177/2024. It requires invoicing software to submit invoice records to AEAT in real time (or near real time) using a cryptographic hash chain.
 
 **Compliance deadlines:**
+
 - Companies: January 1, 2027
 - Self-employed: July 1, 2027
 
@@ -561,3 +562,14 @@ mypy verifactu/
 ## License
 
 MIT. See `LICENSE` for details.
+
+<br>
+
+---
+
+<br>
+
+<div align="center">
+    Made with ❤️ by <a href="https://www.linkedin.com/in/jalvarezz13/" target="_blank"><b>jalvarezz13</b></a>
+    <br>
+</div>
